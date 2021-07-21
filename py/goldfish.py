@@ -1,9 +1,3 @@
-#!/bin/python
-
-import time
-import os
-import csv
-import sys
 import re
 import requests
 
@@ -12,8 +6,6 @@ mana_colorless = 'Colorless'
 mana_alt = 'Special'
 
 mana_full = [mana_colorless] + mana_names + [mana_alt]
-
-land_names = ['island', 'mountain', 'forest', 'swamp', 'plains']
 
 url_base = 'https://www.mtggoldfish.com/price'
 
@@ -196,90 +188,3 @@ def lookup(name, setname, var=None, foil=False, dbg=False):
     info['Power'] = pwr.strip()
     info['Toughness'] = tough.strip()
     return info
-
-
-def run(input_csv, output_csv='detailed.csv', missing_csv='missing.csv'):
-    """
-    Run through input csv, write to output csv
-    """
-
-    cards = {}
-    errors = []
-
-    fields = ['Name'] + mana_full + \
-        ['Type', 'Power', 'Toughness', 'Description']
-
-    # Get already existing cards:
-    try:
-        with open(output_csv, 'r') as fin:
-            for j, line in enumerate(csv.reader(fin, quotechar='"', skipinitialspace=True)):
-                if j == 0:
-                    continue
-                if len(line) == len(fields):
-                    c = {}
-                    m = {}
-                    for i, field in enumerate(fields):
-                        c[field] = line[i]
-                    cards[c['Name']] = c
-    except:
-        cards = {}
-
-    # Re-open, and now prepare to write back out
-    with open(output_csv + '_tmp', 'w') as fout:
-        w = csv.writer(fout, quotechar='"', lineterminator='\n')
-        # Write the header
-        w.writerow(fields)
-        lines = []
-
-        # Read in input
-        with open(input_csv, 'r') as fin:
-            lines = [line for line in csv.reader(
-                fin, quotechar='"', skipinitialspace=True)]
-        args = lines[0]
-
-        # Load cards first to remove duplicates
-        for line in lines[1:]:
-            name = line[args.index('Card')]
-            setn = line[args.index('Set Name')]
-            var = None
-            foil = (line[args.index('Foil')] == 'foil')
-            if len(line) > args.index('Variation'):
-                var = line[args.index('Variation')]
-            if name.lower() in land_names:
-                print('Skipping basic land "%s" from "%s"' % (name, setn))
-            elif not (name in cards):
-                try:
-                    time.sleep(0.5)  # try not to totally spam and get blocked
-                    c = lookup(name, setn, var, foil)
-                    cards[name] = c
-                    print("Got data for '%s'" % name)
-                except KeyboardInterrupt as ki:
-                    raise "Aborted by CTRL+C"
-                except BaseException as se:
-                    print("Error on card %s:\n%s\n\n" % (name, str(se)))
-                    errors.append(line)
-
-        # Write missing
-        with open(missing_csv, 'w') as ferr:
-            we = csv.writer(ferr, quotechar='"', lineterminator='\n')
-            we.writerow(args)
-            for line in errors:
-                we.writerow(line)
-
-        # Write out
-        for c in sorted(cards):
-            card = cards[c]
-            line = []
-            for f in fields:
-                line.append(str(card[f]))
-            w.writerow(line)
-
-    os.rename('%s_tmp' % output_csv, output_csv)
-    print("all done!\n")
-
-
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        run(sys.argv[1])
-    else:
-        print("Need input file")
