@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+<table id="stuff" class="table">
+    <thead>
+        <tr>
+            <th>Herp</th>
+            <th>Derp</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><span class="badge bg-danger">foo</span></td>
+            <td><span class="badge bg-primary">bar</span></td>
+        </tr>
+        <tr>
+            <td><span class="badge bg-success">meh</span></td>
+            <td><span class="badge bg-secondary">baz</span></td>
+        </tr>
+    </table>
+</table>
+
+<script src="js/jquery-3.6.0.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/datatables.min.js"></script>
+
+<script>
+    $(document).ready( function () { $('#stuff').DataTable(); });
+</script>
+
+</body>
+</html>
