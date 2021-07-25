@@ -7,9 +7,10 @@ import sys
 import argparse
 import pprint
 
+from genhtml import genHTML, mech_fields
 from goldfish import lookup, mana_full
 
-fields = ['Name'] + mana_full + ['Type', 'Power', 'Toughness', 'Description']
+fields = ['Name'] + mana_full + mech_fields
 
 
 def load_existing(f='detailed.csv'):
@@ -131,6 +132,9 @@ def call_scrape(args):
     if args.gen_csv:
         write_csv(args.output, cards)
 
+    if args.gen_html:
+        genHTML(cards, args.html_out)
+
     print("Done!")
 
 
@@ -167,6 +171,8 @@ def main(cli_args):
                         help="csv for card errors, used by -e, ignored if -i is not set")
     rparse.add_argument('--output-csv', dest="output",
                         default="detailed.csv", help="Output csv, used by -l, -c")
+    rparse.add_argument('--output-html', dest="html_out",
+                        default="../deploy/cards.html", help="Output html filename, used by -w")
 
     args = parser.parse_args(cli_args)
 
@@ -180,8 +186,9 @@ def main(cli_args):
         print(str(ae))
         parser.print_help()
         return
-    except BaseException as be:
-        print(str(be))
+    # except BaseException as be:
+    #    print("Caught fatal exception:")
+    #    print(str(be))
 
 
 if __name__ == '__main__':

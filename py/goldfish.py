@@ -1,7 +1,8 @@
 import re
 import requests
 
-mana_names = ['X', 'White', 'Black', 'Blue', 'Green', 'Red']
+mana_x = 'X'
+mana_names = [mana_x, 'White', 'Black', 'Blue', 'Green', 'Red']
 mana_colorless = 'Colorless'
 mana_alt = 'Special'
 
