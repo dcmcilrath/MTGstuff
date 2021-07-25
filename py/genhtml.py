@@ -45,7 +45,7 @@ def fancyMana(m, v):
     if m == 'White':
         return makePills('light text-dark', 'W', n=vv)
     elif m == 'Black':
-        return makePills('dark', 'B', n=vv)
+        return makePills('black', 'B', n=vv)
     elif m == 'Green':
         return makePills('success', 'G', n=vv)
     elif m == 'Blue':
@@ -96,11 +96,13 @@ def genTable(cards):
 def genHTML(cards, output='cards.html', template='../web/template.html'):
     i = 0
     lines = []
+    lline = ""
     with open(template, 'r') as fhtml:
         for n, line in enumerate(fhtml):
             lines.append(line)
-            if '</table>' in line:
+            if ('</table>' in line) and ('table id="all-cards"' in ll):
                 i = n
+            ll = line
     tbl = genTable(cards)
     with open(output, 'w') as fout:
         fout.write(''.join(lines[:i]))

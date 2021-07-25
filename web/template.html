@@ -1,16 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <link rel="stylesheet" href="css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
-        .table {
-            --bs-table-accent-bg: #111;
+        .card-table {
+            --bs-table-accent-bg: #333;
+        }
+        .bg-black {
+            background-color: #000;
         }
     </style>
 </head>
 <body>
-<table id="all-cards" class="table">
+<div class="container float-start">
+    <button class="btn btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mana-filter" aria-expanded="false" aria-controls="mana-filter">
+    Mana Filters
+    </button>
+</div>
+<div class="container float-start"></div>
+    <div class="row collapse float-start" id="mana-filter">
+        <table class="table">
+            <tr>
+                <th></th>
+                <th></th>
+                <th><span class="badge rounded-pill bg-light text-dark">White</span></th>
+                <th><span class="badge rounded-pill bg-black">Black</span></th>
+                <th><span class="badge rounded-pill bg-primary">Blue</span></th>
+                <th><span class="badge rounded-pill bg-success">Green</span></th>
+                <th><span class="badge rounded-pill bg-danger">Red</span></th>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Must Have:</td>
+                <td><input class="form-check-input" type="checkbox" id="include-White"></td>
+                <td><input class="form-check-input" type="checkbox" id="include-Black"></td>
+                <td><input class="form-check-input" type="checkbox" id="include-Blue"></td>
+                <td><input class="form-check-input" type="checkbox" id="include-Green"></td>
+                <td><input class="form-check-input" type="checkbox" id="include-Red"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Must Not Have:</td>
+                <td><input class="form-check-input" type="checkbox" id="exclude-White"></td>
+                <td><input class="form-check-input" type="checkbox" id="exclude-Black"></td>
+                <td><input class="form-check-input" type="checkbox" id="exclude-Blue"></td>
+                <td><input class="form-check-input" type="checkbox" id="exclude-Green"></td>
+                <td><input class="form-check-input" type="checkbox" id="exclude-Red"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<table id="all-cards" class="table card-table">
 </table>
 
 <script src="js/jquery-3.6.0.min.js"></script>
@@ -18,7 +61,42 @@
 <script src="js/datatables.min.js"></script>
 
 <script>
-    $(document).ready( function () { $('#all-cards').DataTable(); });
+    const fcolors = ['White', 'Black', 'Blue', 'Green', 'Red'];
+
+    $.fn.dataTable.ext.search.push(
+        function( settings, data, dataIndex ) {
+            for (let i = 0; i < fcolors.length; i++) {
+                let exc = document.getElementById(`exclude-${fcolors[i]}`).checked;
+                let inc = document.getElementById(`include-${fcolors[i]}`).checked;
+                let has = data[3+i].includes(fcolors[i][0]);
+
+                if (exc && has) {
+                    return false;
+                }
+                if (inc && (!has)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    )
+
+
+    $(document).ready( function () {
+        var allCardsTable = $('#all-cards').DataTable({
+           "paging": false
+        });
+
+        var redraw = function() {
+            allCardsTable.draw();
+        }
+
+        for (let i = 0; i < fcolors.length; i++) {
+            document.getElementById(`exclude-${fcolors[i]}`).onclick = redraw;
+            document.getElementById(`include-${fcolors[i]}`).onclick = redraw;
+        }
+    });
 </script>
 
 </body>
