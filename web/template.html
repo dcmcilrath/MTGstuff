@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/dataTables.bootstrap5.min.css">
@@ -8,18 +9,21 @@
         .card-table {
             --bs-table-accent-bg: #333;
         }
+
         .bg-black {
             background-color: #000;
         }
     </style>
 </head>
+
 <body>
-<div class="container float-start">
-    <button class="btn btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mana-filter" aria-expanded="false" aria-controls="mana-filter">
-    Mana Filters
-    </button>
-</div>
-<div class="container float-start"></div>
+    <div class="container float-start">
+        <button class="btn btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mana-filter"
+            aria-expanded="false" aria-controls="mana-filter">
+            Mana Filters
+        </button>
+    </div>
+    <div class="container float-start"></div>
     <div class="row collapse float-start" id="mana-filter">
         <table class="table">
             <tr>
@@ -51,53 +55,54 @@
             </tr>
         </table>
     </div>
-</div>
+    </div>
 
-<table id="all-cards" class="table card-table">
-</table>
+    <table id="all-cards" class="table card-table">
+    </table>
 
-<script src="js/jquery-3.6.0.min.js"></script>
-<script src="js/bootstrap.bundle.min.js"></script>
-<script src="js/datatables.min.js"></script>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/datatables.min.js"></script>
 
-<script>
-    const fcolors = ['White', 'Black', 'Blue', 'Green', 'Red'];
+    <script>
+        const fcolors = ['White', 'Black', 'Blue', 'Green', 'Red'];
 
-    $.fn.dataTable.ext.search.push(
-        function( settings, data, dataIndex ) {
-            for (let i = 0; i < fcolors.length; i++) {
-                let exc = document.getElementById(`exclude-${fcolors[i]}`).checked;
-                let inc = document.getElementById(`include-${fcolors[i]}`).checked;
-                let has = data[3+i].includes(fcolors[i][0]);
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex) {
+                for (let i = 0; i < fcolors.length; i++) {
+                    let exc = document.getElementById(`exclude-${fcolors[i]}`).checked;
+                    let inc = document.getElementById(`include-${fcolors[i]}`).checked;
+                    let has = data[3 + i];
 
-                if (exc && has) {
-                    return false;
+                    if (exc && has) {
+                        return false;
+                    }
+                    if (inc && (!has)) {
+                        return false;
+                    }
                 }
-                if (inc && (!has)) {
-                    return false;
-                }
+
+                return true;
+            }
+        )
+
+
+        $(document).ready(function () {
+            var allCardsTable = $('#all-cards').DataTable({
+                "paging": false
+            });
+
+            var redraw = function () {
+                allCardsTable.draw();
             }
 
-            return true;
-        }
-    )
-
-
-    $(document).ready( function () {
-        var allCardsTable = $('#all-cards').DataTable({
-           "paging": false
+            for (let i = 0; i < fcolors.length; i++) {
+                document.getElementById(`exclude-${fcolors[i]}`).onclick = redraw;
+                document.getElementById(`include-${fcolors[i]}`).onclick = redraw;
+            }
         });
-
-        var redraw = function() {
-            allCardsTable.draw();
-        }
-
-        for (let i = 0; i < fcolors.length; i++) {
-            document.getElementById(`exclude-${fcolors[i]}`).onclick = redraw;
-            document.getElementById(`include-${fcolors[i]}`).onclick = redraw;
-        }
-    });
-</script>
+    </script>
 
 </body>
+
 </html>
