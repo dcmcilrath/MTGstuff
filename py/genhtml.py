@@ -43,7 +43,7 @@ def fancyMana(m, v):
         return v
 
     if m == 'White':
-        return makePills('light text-dark', 'W', n=vv)
+        return makePills('white text-dark', 'W', n=vv)
     elif m == 'Black':
         return makePills('black', 'B', n=vv)
     elif m == 'Green':
