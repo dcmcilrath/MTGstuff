@@ -66,6 +66,7 @@ def genCardRow(card):
             v = int(card[h])
         except:
             pass
+
         if h == conv_mana:
             ls.append(computeConverted(card))
         elif h == mana_colorless:
@@ -80,8 +81,11 @@ def genCardRow(card):
                 ls.append(card[h])
         elif h in mana_names:
             ls.append(fancyMana(h, card[h]))
+        elif 'N/A' in card[h]:
+            ls.append('')
         else:
             ls.append(card[h])
+
     return makeRow(ls)
 
 
