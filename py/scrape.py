@@ -28,7 +28,7 @@ def load_existing(f='detailed.csv'):
     return cards
 
 
-def load_unprocessed(f, cards={}):
+def load_unprocessed(f, cards={}, dbg=False):
     errors = []
 
     with open(f, 'r') as fin:
@@ -47,7 +47,7 @@ def load_unprocessed(f, cards={}):
         if not (name in cards):
             try:
                 time.sleep(0.5)  # try not to totally spam and get blocked
-                c = lookup(name, setn, var, foil)
+                c = lookup(name, setn, var, foil, dbg=dbg)
                 cards[name] = c
                 print("Got data for '%s'" % name)
             except KeyboardInterrupt as ki:
@@ -119,7 +119,7 @@ def call_scrape(args):
 
     # Scrape unprocessed cards
     if args.scrape:
-        cards, errors, a = load_unprocessed(args.input, cards)
+        cards, errors, a = load_unprocessed(args.input, cards, dbg=args.debug)
 
         # Write out errors
         if args.dump_errors:
@@ -164,7 +164,9 @@ def main(cli_args):
     rparse.add_argument(
         '-c', dest="gen_csv", action="store_true", help="Write to .csv")
     rparse.add_argument('-w', dest="gen_html",
-                        action="store_true", help="build webpage (Not yet implemented)")
+                        action="store_true", help="build webpage")
+    rparse.add_argument('-d', dest="debug", action='store_true',
+                        help="Show debugging information")
     rparse.add_argument('--input-csv', dest="input", default="my_collection.csv",
                         help="goldfish file to process, defines file to use for -i")
     rparse.add_argument('--error-csv', dest="errors", default="missing.csv",
@@ -172,7 +174,7 @@ def main(cli_args):
     rparse.add_argument('--output-csv', dest="output",
                         default="detailed.csv", help="Output csv, used by -l, -c")
     rparse.add_argument('--output-html', dest="html_out",
-                        default="../deploy/cards.html", help="Output html filename, used by -w")
+                        default="deploy/index.html", help="Output html filename, used by -w")
 
     args = parser.parse_args(cli_args)
 

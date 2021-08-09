@@ -20,6 +20,7 @@ sublist = {
 
 def fixname(s):
     s = s.strip()
+    s = s.replace('+', '%252B')
     s = re.sub(r"['\.,:/\\]", '', s)
     s = re.sub(r'\s+', ' ', s)
     return re.sub(' ', '+', s)
