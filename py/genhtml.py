@@ -14,10 +14,6 @@ def makeRow(elements, header=False):
     return sr
 
 
-def genHeader():
-    return makeRow(html_fields, header=True)
-
-
 def computeConverted(card):
     mset = set(mana_full) - set(mana_x)
     count = 0
@@ -89,26 +85,69 @@ def genCardRow(card):
     return makeRow(ls)
 
 
-def genTable(cards):
+def genCardTable(cards):
     body = ""
     for c in cards:
         body += genCardRow(cards[c])
-    tbl = "<thead>%s</thead><tbody>%s</tbody>" % (genHeader(), body)
+    tbl = "<thead>%s</thead><tbody>%s</tbody>" % (
+        makeRow(html_fields, header=True), body)
     return tbl
 
 
+def getTypeList(cards):
+    full_list = set()
+    exclude = set(['--', '-', '', '//', '—'])
+    for c in cards:
+        sp = cards[c]['Type'].split(' ')
+        full_list |= set(sp)
+    return list(full_list - exclude)
+
+
+def makeCheckBoxes(tlist):
+    return ['<input class="form-check-input" type="checkbox" id="type-%s"> %s' % (t, t) for t in tlist]
+
+
+def genTypeTable(cards):
+    types = getTypeList(cards)
+    types.sort()
+    n = 0
+    tbl = ""
+    while n < len(types):
+        m = min(12, len(types)-n)
+        tbl += makeRow(makeCheckBoxes(types[n:n+m]))
+        n += m
+    return tbl
+
+
+def getTableBreakpoints(lines, ids):
+    blist = []
+    ll = ""
+    for n, line in enumerate(lines):
+        if '</table>' in line:
+            for i in ids:
+                s = 'table id="%s"' % i
+                if s in ll:
+                    blist.append((n, i))
+        ll = line
+    return blist
+
+
 def genHTML(cards, output='cards.html', template='../web/template.html'):
-    i = 0
     lines = []
-    lline = ""
     with open(template, 'r') as fhtml:
-        for n, line in enumerate(fhtml):
-            lines.append(line)
-            if ('</table>' in line) and ('table id="all-cards"' in ll):
-                i = n
-            ll = line
-    tbl = genTable(cards)
+        lines = [line for line in fhtml]
+
+    card_tbl = genCardTable(cards)
+    type_tbl = genTypeTable(cards)
+
+    bps = getTableBreakpoints(lines, ['all-cards', 'types'])
+    i = 0
     with open(output, 'w') as fout:
-        fout.write(''.join(lines[:i]))
-        fout.write(tbl)
-        fout.write(''.join(lines[i:]))
+        for n, t in bps:
+            fout.write(''.join(lines[i:n]))
+            i = n
+            if t == 'all-cards':
+                fout.write(card_tbl)
+            elif t == 'types':
+                fout.write(type_tbl)
+        fout.write(''.join(lines[n:]))
