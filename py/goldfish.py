@@ -12,7 +12,8 @@ url_base = 'https://www.mtggoldfish.com/price'
 
 # Just cuz
 sublist = {
-    'Commander Anthology 2018': 'Commander Anthology Volume II'
+    'Commander Anthology 2018': 'Commander Anthology Volume II',
+    'Magic: The Gathering—Conspiracy': 'Conspiracy'
 }
 
 # url-ify names
@@ -102,6 +103,9 @@ def lookup(name, setname, var=None, foil=False, dbg=False):
 
     n = fixname(name)
     sn = fixname(setname)
+
+    if dbg:
+        print('Looking for card "%s" in set "%s"' % (name, setname))
 
     if setname in sublist:
         print("Note: set changed from '%s' to '%s' for card '%s'" %
